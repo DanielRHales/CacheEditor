@@ -1,0 +1,12 @@
+<component name="ArtifactManager">
+  <artifact type="jar" build-on-make="true" name="Cache Editor:jar">
+    <output-path>$PROJECT_DIR$/proguard</output-path>
+    <root id="archive" name="Cache Editor.jar">
+      <element id="directory" name="META-INF">
+        <element id="file-copy" path="$PROJECT_DIR$/META-INF/MANIFEST.MF" />
+      </element>
+      <element id="module-output" name="Cache Editor" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/jvnet/substance/Substance/1.0/Substance-1.0.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>
