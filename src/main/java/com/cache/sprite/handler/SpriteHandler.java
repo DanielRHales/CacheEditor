@@ -46,14 +46,7 @@ public class SpriteHandler {
     public static void removeCachedBean(Cached cached) {
         final BeanType beanType = cached.getBeanType();
         if (BEANS.get(beanType).contains(cached)) {
-            BEANS.get(beanType).remove(cached);
-            final List<Bean> list = new ArrayList<Bean>();
-            for (int index = 0; index < BEANS.get(beanType).size(); index++) {
-                final Cached indexed = ((Cached) BEANS.get(beanType).get(index));
-                indexed.setId(index);
-                list.add(indexed);
-            }
-            BEANS.put(beanType, list);
+            cached.remove();
         }
     }
 

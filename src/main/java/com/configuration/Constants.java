@@ -17,8 +17,6 @@ public class Constants {
 
     private static final File MAIN_DIRECTORY = new File(DESKTOP, String.format("%sCache Editor", SERVER_NAME));
 
-    public static final File ERROR_DIRECTORY = new File(MAIN_DIRECTORY, "Errors");
-
     private static final File CACHE_DIRECTORY = new File(MAIN_DIRECTORY, "Cache");
 
     private static final File SPRITES_DIRECTORY = new File(CACHE_DIRECTORY, "Sprites");
@@ -48,7 +46,6 @@ public class Constants {
     static {
         Environment.createDirectories(
                 MAIN_DIRECTORY,
-                ERROR_DIRECTORY,
                 CACHE_DIRECTORY,
                 SPRITES_DIRECTORY,
                 DUMPED_SPRITES_DIRECTORY,

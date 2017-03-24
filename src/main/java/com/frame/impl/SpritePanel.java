@@ -166,6 +166,7 @@ public class SpritePanel extends CachePanel {
             @Override
             protected void actionPerformed() {
                 if (getBean() != null) {
+                    getCacheLoader().removeBean(getBean());
                     if (getBean().getBeanType().equals(BeanType.CACHED)) {
                         SpriteHandler.removeCachedBean((Cached) getBean());
                         getCacheLoader().setCachedListModel(cachedSpriteList);
@@ -173,7 +174,6 @@ public class SpritePanel extends CachePanel {
                         SpriteHandler.removeRawBean((Raw) getBean());
                         getCacheLoader().setRawListModel(rawSpriteList);
                     }
-                    getCacheLoader().removeBean(getBean());
                     setBean(null);
                     spriteTable.setModel(new DefaultTableModel());
                     spriteLabel.setIcon(new ImageIcon());

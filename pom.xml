@@ -24,8 +24,8 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.jvnet.substance</groupId>
-            <artifactId>Substance</artifactId>
+            <groupId>org.LG1</groupId>
+            <artifactId>Logger</artifactId>
             <version>1.0</version>
         </dependency>
     </dependencies>

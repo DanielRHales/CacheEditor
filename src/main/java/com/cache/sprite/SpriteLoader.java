@@ -8,6 +8,7 @@ import com.cache.sprite.util.BeanType;
 import com.configuration.Constants;
 import com.configuration.util.Environment;
 import com.logging.Logger;
+import com.resource.FileOperations;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -16,8 +17,6 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.nio.MappedByteBuffer;
-import java.nio.channels.FileChannel;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -85,13 +84,12 @@ public class SpriteLoader extends CacheLoader {
         }
     }
 
+    @SuppressWarnings("all")
     public void removeBean(Bean bean) {
         if (bean.getBeanType().equals(BeanType.CACHED)) {
-            final Cached cached = (Cached) bean;
-            cached.saveImage(new File(Constants.REMOVED_CACHED_SPRITES_DIRECTORY, String.format("%d-%s.png", cached.getId(), String.valueOf(new Date()).replace(":", "_"))));
+            ((Cached) bean).saveImage(new File(Constants.REMOVED_CACHED_SPRITES_DIRECTORY, String.format("%d-%s.png", ((Cached) bean).getId(), String.valueOf(new Date()).replace(":", "_"))));
         } else if (bean.getBeanType().equals(BeanType.RAW)) {
-            final Raw raw = (Raw) bean;
-            raw.getFile().renameTo(new File(Constants.REMOVED_RAW_SPRITES_DIRECTORY, String.format("[%s]%s", String.valueOf(new Date()).replace(":", "_"), raw.getFile().getName())));
+            ((Raw) bean).getFile().renameTo(new File(Constants.REMOVED_RAW_SPRITES_DIRECTORY, String.format("[%s]%s", String.valueOf(new Date()).replace(":", "_"), ((Raw) bean).getFile().getName())));
         }
     }
 
@@ -156,26 +154,6 @@ public class SpriteLoader extends CacheLoader {
 
     private BufferedImage byteArrayToImage(byte[] data) throws IOException {
         return ImageIO.read(new ByteArrayInputStream(data));
-    }
-
-    private byte[] readFile(File file) {
-        try {
-            RandomAccessFile randomAccessFile = new RandomAccessFile(file, "r");
-            MappedByteBuffer buffer = randomAccessFile.getChannel().map(FileChannel.MapMode.READ_ONLY, 0L, randomAccessFile.length());
-            if (!buffer.hasArray()) {
-                byte[] bytes = new byte[buffer.remaining()];
-                buffer.get(bytes);
-                return bytes;
-            }
-            randomAccessFile.close();
-            return buffer.array();
-        } catch (FileNotFoundException ex) {
-            Logger.log(SpriteLoader.class, Level.WARNING, String.format("File not found '%s'", file.getName()), ex);
-            return new byte[]{};
-        } catch (Exception ex) {
-            Logger.log(SpriteLoader.class, Level.WARNING, String.format("Error reading File '%s'", file.getName()), ex);
-            return new byte[]{};
-        }
     }
 
     @SuppressWarnings("unchecked")
@@ -304,13 +282,9 @@ public class SpriteLoader extends CacheLoader {
     }
 
     private void buildCachedList() {
-        listCached();
-    }
-
-    private void listCached() {
         try {
-            final DataInputStream indexStream = new DataInputStream(new GZIPInputStream(new ByteArrayInputStream(readFile(Constants.CACHED_SPRITES_INDEX_FILE))));
-            final DataInputStream dataStream = new DataInputStream(new GZIPInputStream(new ByteArrayInputStream(readFile(Constants.CACHED_SPRITES_DATA_FILE))));
+            final DataInputStream indexStream = new DataInputStream(new GZIPInputStream(new ByteArrayInputStream(FileOperations.readFile(Constants.CACHED_SPRITES_INDEX_FILE))));
+            final DataInputStream dataStream = new DataInputStream(new GZIPInputStream(new ByteArrayInputStream(FileOperations.readFile(Constants.CACHED_SPRITES_DATA_FILE))));
             int size = indexStream.readInt();
             for (int index = 0; index < size; index++) {
                 indexStream.readInt();
@@ -325,7 +299,6 @@ public class SpriteLoader extends CacheLoader {
             Logger.log(SpriteLoader.class, Level.WARNING, "Error Building Cached List", ex);
         }
     }
-
 
     private static class InstanceHolder {
         private static SpriteLoader instance;

@@ -23,12 +23,12 @@ public final class StreamHash {
         } catch (IOException ex) {
             Logger.log(StreamHash.class, Level.WARNING, "Error getting stream", ex);
         } catch (NoSuchAlgorithmException ex) {
-            Logger.log(StreamHash.class, Level.WARNING, "Error getting stream", ex);
+            Logger.log(StreamHash.class, Level.WARNING, "No Such Algorithm", ex);
         }
         return null;
     }
 
-    private static byte[] getBytes(final InputStream stream) throws NoSuchAlgorithmException, IOException {
+    public static byte[] getBytes(final InputStream stream) throws NoSuchAlgorithmException, IOException {
         final MessageDigest digest = Configuration.getDigest();
         int value;
         final byte[] buffer = new byte[128];
