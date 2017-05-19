@@ -36,9 +36,7 @@ public class SpriteHandler {
         if (BEANS.get(beanType).contains(raw)) {
             BEANS.get(beanType).remove(raw);
             final List<Bean> list = new ArrayList<Bean>();
-            for (Bean array : BEANS.get(beanType)) {
-                list.add(array);
-            }
+            list.addAll(BEANS.get(beanType));
             BEANS.put(beanType, list);
         }
     }

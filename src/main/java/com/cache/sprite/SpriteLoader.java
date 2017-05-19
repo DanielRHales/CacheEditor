@@ -8,7 +8,6 @@ import com.cache.sprite.util.BeanType;
 import com.configuration.Constants;
 import com.configuration.util.Environment;
 import com.logging.Logger;
-import com.resource.FileOperations;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;

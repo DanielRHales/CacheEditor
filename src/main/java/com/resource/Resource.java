@@ -30,6 +30,8 @@ public class Resource {
 
     public static final Image DUMP_DATA = getResourceImage("DumpData", "png", new Dimension(16, 16));
 
+    public static final Image REPLACE_IMAGE = getResourceImage("ReplaceImage", "png", new Dimension(16, 16));
+
     public static final List<Image> ICONS_LIST = Arrays.asList(
             getResizedImage(ICON, 16, 16),
             getResizedImage(ICON, 32, 32)

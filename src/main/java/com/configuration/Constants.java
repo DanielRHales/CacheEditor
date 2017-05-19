@@ -11,11 +11,7 @@ public class Constants {
 
     public static final String SERVER_NAME = "";
 
-    private static final String HOME = System.getProperty("user.home");
-
-    private static final File DESKTOP = new File(HOME, "Desktop");
-
-    private static final File MAIN_DIRECTORY = new File(DESKTOP, String.format("%sCache Editor", SERVER_NAME));
+    private static final File MAIN_DIRECTORY = new File("./", String.format("%sCache Editor", SERVER_NAME));
 
     private static final File CACHE_DIRECTORY = new File(MAIN_DIRECTORY, "Cache");
 

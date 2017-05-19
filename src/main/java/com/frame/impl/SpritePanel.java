@@ -16,7 +16,10 @@ import com.resource.Resource;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.util.*;
+import java.awt.event.ActionEvent;
+import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -37,6 +40,7 @@ public class SpritePanel extends CachePanel {
     }
 
     @Override
+    @SuppressWarnings("all")
     protected void initialize() {
         GridBagConstraints gridBagConstraints;
 
@@ -44,6 +48,7 @@ public class SpritePanel extends CachePanel {
         final JButton packButton = new JButton();
         final JButton insertAll = new JButton();
         final JButton insertSelected = new JButton();
+        final JButton replaceSelected = new JButton();
         final JButton dumpData = new JButton();
         final JButton deleteImage = new JButton();
         final JButton reloadIndex = new JButton();
@@ -56,7 +61,7 @@ public class SpritePanel extends CachePanel {
         final JLabel spriteLabel = new JLabel();
 
         final List<Component> components = new ArrayList<Component>(
-                Arrays.asList(packButton, insertAll, insertSelected, dumpData, deleteImage, reloadIndex, cachedSpriteList, rawSpriteList, spriteTable)
+                Arrays.asList(packButton, insertAll, insertSelected, replaceSelected, dumpData, deleteImage, reloadIndex, cachedSpriteList, rawSpriteList, spriteTable)
         );
 
         controlPanel.setBorder(BorderFactory.createTitledBorder("Controls"));
@@ -116,19 +121,21 @@ public class SpritePanel extends CachePanel {
             protected void actionPerformed() {
                 if (getBean() != null) {
                     if (getBean().getBeanType().equals(BeanType.RAW)) {
-                        final Raw raw = (Raw) getBean();
-                        final Cached cached = new Cached();
-                        final int index = SpriteHandler.getBeanList(BeanType.CACHED).size();
-                        cached.setId(index);
-                        cached.setName(raw.getFile().getName().substring(0, raw.getFile().getName().lastIndexOf('.')));
-                        cached.setBytes(raw.getBytes());
-                        cached.setImage(raw.getImage());
-                        SpriteHandler.submit(cached);
-                        setBean(null);
-                        getCacheLoader().setCachedListModel(cachedSpriteList);
-                        getCacheLoader().setRawListModel(rawSpriteList);
-                        cachedSpriteList.setSelectedIndex(index);
-                        cachedSpriteList.ensureIndexIsVisible(index);
+                        for (Object bean : rawSpriteList.getSelectedValues()) {
+                            final Raw raw = (Raw) bean;
+                            final Cached cached = new Cached();
+                            final int index = SpriteHandler.getBeanList(BeanType.CACHED).size();
+                            cached.setId(index);
+                            cached.setName(raw.getFile().getName().substring(0, raw.getFile().getName().lastIndexOf('.')));
+                            cached.setBytes(raw.getBytes());
+                            cached.setImage(raw.getImage());
+                            SpriteHandler.submit(cached);
+                            setBean(null);
+                            getCacheLoader().setCachedListModel(cachedSpriteList);
+                            getCacheLoader().setRawListModel(rawSpriteList);
+                            cachedSpriteList.setSelectedIndex(index);
+                            cachedSpriteList.ensureIndexIsVisible(index);
+                        }
                     }
                 }
             }
@@ -137,6 +144,37 @@ public class SpritePanel extends CachePanel {
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
         controlPanel.add(insertSelected, gridBagConstraints);
+
+        replaceSelected.setIcon(new ImageIcon(Resource.REPLACE_IMAGE));
+        replaceSelected.setToolTipText("Replace Packed Image");
+        new ButtonListener(replaceSelected) {
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                if (getBean().getBeanType().equals(BeanType.RAW)) {
+                    String value = JOptionPane.showInputDialog(null, "Enter an Index to Replace", "Replace Cached", JOptionPane.INFORMATION_MESSAGE);
+                    if (value.matches("[\\d]+")) {
+                        final int id = Integer.parseInt(value);
+                        if (id > -1 && id <= rawSpriteList.getModel().getSize()) {
+                            final Raw raw = (Raw) bean;
+                            final Cached cached = SpriteHandler.getCachedBean(id);
+                            cached.setId(id);
+                            cached.setName("");
+                            cached.setBytes(raw.getBytes());
+                            cached.setImage(raw.getImage());
+                            setBean(null);
+                            getCacheLoader().setCachedListModel(cachedSpriteList);
+                            getCacheLoader().setRawListModel(rawSpriteList);
+                            cachedSpriteList.setSelectedIndex(id);
+                            cachedSpriteList.ensureIndexIsVisible(id);
+                        }
+                    }
+                }
+            }
+        };
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 0;
+        controlPanel.add(replaceSelected, gridBagConstraints);
 
         dumpData.setIcon(new ImageIcon(Resource.DUMP_DATA));
         dumpData.setToolTipText("Dump Data");
@@ -156,7 +194,7 @@ public class SpritePanel extends CachePanel {
             }
         };
         gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridx = 4;
         gridBagConstraints.gridy = 0;
         controlPanel.add(dumpData, gridBagConstraints);
 
@@ -181,7 +219,7 @@ public class SpritePanel extends CachePanel {
             }
         };
         gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 4;
+        gridBagConstraints.gridx = 5;
         gridBagConstraints.gridy = 0;
         controlPanel.add(deleteImage, gridBagConstraints);
 
@@ -189,7 +227,6 @@ public class SpritePanel extends CachePanel {
         reloadIndex.setToolTipText("Reload Index");
         new ButtonListener(reloadIndex) {
             @Override
-            @SuppressWarnings("unchecked")
             protected void actionPerformed() {
                 setBean(null);
                 cachedSpriteList.setModel(new DefaultListModel());
@@ -211,7 +248,7 @@ public class SpritePanel extends CachePanel {
             }
         };
         gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 8;
+        gridBagConstraints.gridx = 6;
         gridBagConstraints.gridy = 0;
         controlPanel.add(reloadIndex, gridBagConstraints);
 
@@ -220,9 +257,20 @@ public class SpritePanel extends CachePanel {
         cachedSpriteScroll.setBorder(BorderFactory.createTitledBorder("Cached"));
         cachedSpriteList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
+        cachedSpriteList.setCellRenderer(new ListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                final Cached cached = SpriteHandler.getCachedBean(index);
+                BufferedImage image = cached.getImage();
+                if (image.getWidth() > 25 || image.getHeight() > 25) {
+                    image = (BufferedImage) Resource.getResizedImage(image, 25, 25);
+                }
+                return new JLabel(String.valueOf(index), new ImageIcon(image), SwingConstants.LEFT);
+            }
+        });
+
         new ListListener(cachedSpriteList) {
             @Override
-            @SuppressWarnings("all")
             protected void valueChanged() {
                 final Cached cached = (Cached) cachedSpriteList.getSelectedValue();
                 if (!cachedSpriteList.getValueIsAdjusting()) {
@@ -241,11 +289,21 @@ public class SpritePanel extends CachePanel {
         rawSpriteScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         rawSpriteScroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         rawSpriteScroll.setBorder(BorderFactory.createTitledBorder("Raw"));
-        rawSpriteList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        rawSpriteList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        rawSpriteList.setCellRenderer(new ListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                final Raw raw = SpriteHandler.getRawBean(index);
+                BufferedImage image = raw.getImage();
+                if (image.getWidth() > 25 || image.getHeight() > 25) {
+                    image = (BufferedImage) Resource.getResizedImage(image, 25, 25);
+                }
+                return new JLabel(String.valueOf(index), new ImageIcon(image), SwingConstants.LEFT);
+            }
+        });
 
         new ListListener(rawSpriteList) {
             @Override
-            @SuppressWarnings("all")
             protected void valueChanged() {
                 final Raw rawBean = (Raw) rawSpriteList.getSelectedValue();
                 if (!rawSpriteList.getValueIsAdjusting()) {
